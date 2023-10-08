@@ -2,7 +2,7 @@
 import sys
 import requests
 from bs4 import BeautifulSoup
-from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QLineEdit, QVBoxLayout, QPushButton, QTextEdit, QFileDialog,
+from PyQt5.QtWidgets import (QTableWidgetItem, QTableWidget, QApplication, QWidget, QLabel, QLineEdit, QVBoxLayout, QPushButton, QTextEdit, QFileDialog,
                              QHBoxLayout, QListWidget, QListWidgetItem, QCheckBox, QTreeWidget, QTreeWidgetItem, QErrorMessage, QMessageBox, QSpacerItem, QSizePolicy, QDialog)
 from PyQt5.QtCore import QThread, pyqtSignal, Qt
 import threading
@@ -244,6 +244,11 @@ class WebCrawlerApp(QWidget):
         self.about_button = QPushButton("About Us", self)
         self.about_button.clicked.connect(self.show_about)
 
+        self.table = QTableWidget(self)
+        self.table.setColumnCount(3)
+        self.table.setHorizontalHeaderLabels(['URL', 'Title', 'Meta Description'])
+        self.table.setRowCount(0)
+
         # QTreeWidget for crawled pages
         self.crawled_pages_tree = QTreeWidget(self)
         self.crawled_pages_tree.setHeaderLabels(["URL"])
@@ -265,6 +270,7 @@ class WebCrawlerApp(QWidget):
         layout.addWidget(self.result_text)
         layout.addWidget(self.status_label)
         layout.addWidget(self.crawled_pages_tree)  # Add the tree to the layout
+        layout.addWidget(self.table)
 
         self.setLayout(layout)
 
@@ -339,6 +345,14 @@ class WebCrawlerApp(QWidget):
         self.pause_button.setText("❚❚")
         self.pause_button.setToolTip("Pause crawling")
 
+    def addRow(self, url, title, meta_description):
+        row_position = self.table.rowCount()
+        self.table.insertRow(row_position)
+        
+        self.table.setItem(row_position, 0, QTableWidgetItem(url))
+        self.table.setItem(row_position, 1, QTableWidgetItem(title))
+        self.table.setItem(row_position, 2, QTableWidgetItem(meta_description))
+
     # Update the UI with the currently crawled page's data
     def update_current_page(self, page, pages_crawled, total_pages, page_data):
         if page_data:
@@ -356,6 +370,7 @@ class WebCrawlerApp(QWidget):
             
             # Check if the URL already exists in the tree widget
             if url not in self.url_to_item:
+                
                 # Add the crawled URL as a top-level item in the tree
                 url_item = QTreeWidgetItem(self.crawled_pages_tree)
                 url_item.setText(0, url)
@@ -373,6 +388,8 @@ class WebCrawlerApp(QWidget):
                 # Add the meta description as another child item
                 accessibility_item = QTreeWidgetItem(url_item)
                 accessibility_item.setText(0, "Accessibility: " + page_data[0]['Accessibility'])
+
+                window.addRow(url, title_item, meta_desc_item)
 
                 # Add the URL item to the tree and update the dictionary
                 self.crawled_pages_tree.addTopLevelItem(url_item)
