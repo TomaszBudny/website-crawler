@@ -16,6 +16,29 @@ import logging
 default_url = "http://example.org/"
 version_info = "Version: 1.0.0\nDate: 2023-10-10"
 
+class ConsoleAndFileLogger:
+    def __init__(self, filename):
+        self.terminal = sys.stdout  # console output
+        self.log = open(filename, "a")  # file output
+
+    def write(self, message):
+        self.terminal.write(message)
+        self.log.write(message)
+
+    def flush(self):
+        # this flush method is needed for python 3 compatibility.
+        # this handles the flush command by doing nothing.
+        # you might want to specify some extra behavior here.
+        pass
+
+    def close(self):
+        self.log.close()
+
+console_logger = ConsoleAndFileLogger("console.log")
+
+sys.stdout = console_logger
+sys.stderr = console_logger
+
 # Set up logging at the start of your script
 logging.basicConfig(filename='error.log', level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -58,7 +81,7 @@ def save_to_csv(data_list, filename="output.csv"):
 
     # Use a predefined order for the headers
     headers = [
-        "URL", "Alias", "PSI", "Title", "H1 Tag Present", "Meta Description", 
+        "H1", "URL", "Alias", "PSI", "Title", "Meta Description", 
         "Robots", "WP version", "Page Weight", "Heading structure", "Accessibility", "W3C", "GTM"
     ]
 
@@ -111,7 +134,7 @@ class CrawlerThread(QThread):
                     # Append the page_data to all_page_data
                     all_page_data.append(page_data)
 
-                    self.page_signal.emit(title_data if title_data else "", self.pages_visited+1, self.total_pages_found, page_data if page_data else "")
+                    self.page_signal.emit(title_data if title_data else "", self.pages_visited+1, self.total_pages_found, page_data if page_data else [])
         
         # Print out all the page_data after crawling is done
         save_to_csv(all_page_data)
@@ -155,10 +178,10 @@ class CrawlerThread(QThread):
         title_data += f" - Page Weight: {page_weight} bytes"
 
         page_data = {
-            "Title": check_h1_tag(soup),
+            "H1": check_h1_tag(soup),
             "URL": url,
             "Alias": "/" + url.replace(self.url, ""),
-            "H1 Tag Present": check_title_tag(soup),
+            "Title": check_title_tag(soup),
             "Meta Description": check_meta_description(soup),
             "Robots": check_meta_robots(soup),
             "WP version": check_wordpress_version(soup),

@@ -4,3 +4,4 @@ __pycache__/
 # Ignore specific files
 output.csv
 error.log
+console.log

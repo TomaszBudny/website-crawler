@@ -122,7 +122,7 @@ def w3c_validation(url):
 def check_h1_tag(soup):
     """Retrieve the content of the h1 tag from the page."""
     h1_tag = soup.find('h1')
-    return h1_tag.text if h1_tag else None
+    return h1_tag.text.strip() if h1_tag else None
 
 def check_title_tag(soup):
     """Retrieve the content of the title tag from the page."""
