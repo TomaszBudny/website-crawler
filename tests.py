@@ -109,9 +109,11 @@ def w3c_validation(url):
             errors = [msg for msg in data["messages"] if msg["type"] == "error"]
             
             if errors:
-                print(f"Found {len(errors)} errors:")
+                # print(f"Found {len(errors)} errors:")
+                print('placeholder')
                 for error in errors:
-                    print(f"- {error['message']} (Line: {error['lastLine']})")
+                    # print(f"- {error['message']} (Line: {error['lastLine']})")
+                    print('placeholder')
             else:
                 print("No errors found!")
         else:
@@ -167,9 +169,9 @@ def run_accessibility_check(url):
     driver.get(url)
 
     # If it's the starting URL, add the "contrast" cookie and refresh the page
-    # driver.add_cookie({"name": "contrast", "value": "true"})
-
-    # time.sleep(1)  # Wait for a second to allow potential changes to take effect
+    driver.add_cookie({"name": "contrast", "value": "true"})
+    driver.refresh() 
+    time.sleep(1)  # Wait for a second to allow potential changes to take effect
     axe.inject()
     audit_result = axe.run()
 
@@ -179,7 +181,7 @@ def run_accessibility_check(url):
     #     results[url] = [violation['description'] for violation in violations_to_report]
     # print(f"{url} : {results[url]}")
 
-    print(f"{url} : {[violation['description'] for violation in violations_to_report]}")
+    # print(f"{url} : {[violation['description'] for violation in violations_to_report]}")
 
     driver.quit()
 

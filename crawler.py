@@ -45,7 +45,7 @@ logging.basicConfig(filename='error.log', level=logging.ERROR, format='%(asctime
 def handle_uncaught_exception(exc_type, exc_value, exc_traceback):
     """Handle uncaught exceptions, log them, and display a pop-up."""
     # Log the exception
-    with open('error.log', 'a') as f:
+    with open('error.log', 'a', encoding='utf-8') as f:
         f.write(f"Exception type: {exc_type}\n")
         f.write(f"Exception value: {exc_value}\n")
         f.write(f"Exception traceback: {exc_traceback}\n\n")
@@ -65,7 +65,7 @@ def handle_uncaught_exception(exc_type, exc_value, exc_traceback):
 sys.excepthook = handle_uncaught_exception
 
 # Number of concurrent threads for crawling
-MAX_THREADS = 3  
+MAX_THREADS = 1  
 
 def save_to_csv(data_list, filename="output.csv"):
     """
@@ -91,7 +91,7 @@ def save_to_csv(data_list, filename="output.csv"):
         return
 
     # Write data to the CSV file
-    with open(filename, 'w', newline='') as csvfile:
+    with open(filename, 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=headers)
         writer.writeheader()  # Write the headers (column names)
         for data in flat_data:
@@ -155,7 +155,7 @@ class CrawlerThread(QThread):
         # Check if the content type is not HTML
         if 'text/html' not in response.headers.get('Content-Type', ''):
             # Log or print a message if you want
-            print(f"URL {url} returned non-HTML content. Skipping parsing.")
+            # print(f"URL {url} returned non-HTML content. Skipping parsing.")
             return [], None, None
 
         soup = BeautifulSoup(response.content, 'html.parser')
@@ -389,7 +389,7 @@ class WebCrawlerApp(QWidget):
                 accessibility_item = QTreeWidgetItem(url_item)
                 accessibility_item.setText(0, "Accessibility: " + page_data[0]['Accessibility'])
 
-                window.addRow(url, title_item, meta_desc_item)
+                window.addRow(url, title, meta_desc)
 
                 # Add the URL item to the tree and update the dictionary
                 self.crawled_pages_tree.addTopLevelItem(url_item)
